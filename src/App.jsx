@@ -92,17 +92,18 @@ const LS_KEY = '$-todos_'; //todo list constant
 function TodoList() {
   const [todos, setTodos] = useState([]); //init
 
-  const addTodo = useCallback(todo => {
-    setTodos(todos => [...todos, todo]);
-  }, []);
-
   useEffect(() => {
-    JSON.parse(localStorage.getItem(LS_KEY));
+    const todos = JSON.parse(localStorage.getItem(LS_KEY)) || '';
+    setTodos(todos);
   }, []);
 
   useEffect(() => {
     localStorage.setItem(LS_KEY, JSON.stringify(todos));
   }, [todos]); //run after todos change
+
+  const addTodo = useCallback(todo => {
+    setTodos(todos => [...todos, todo]);
+  }, []);
 
   const removeTodo = useCallback(id => {
     setTodos(todos =>
