@@ -14,11 +14,12 @@ let idSeq = Date.now(); //time stamp
 function Control(props) {
   const { addTodo } = props;
   const inputRef = useRef();
+
   const onSubmit = e => {
     e.preventDefault();
     const newText = inputRef.current.value.trim(); //清除留白
     if (newText.length === 0) {
-      return;
+      return; //if empty then not submit
     }
 
     addTodo({
@@ -31,8 +32,8 @@ function Control(props) {
   };
 
   return (
-    <Fragment className='control'>
-      <h1> Todo List</h1>
+    <div className='control'>
+      <h1>Todo List</h1>
       <form onSubmit={onSubmit}>
         <input
           type='text'
@@ -41,13 +42,52 @@ function Control(props) {
           placeholder='What needs to be done?'
         />
       </form>
-    </Fragment>
+    </div>
   );
 }
 
-function Todos() {
-  return <Fragment></Fragment>;
+function TodoItem(props) {
+  const {
+    todo: { id, text, complete },
+    toggleTodo,
+    removeTodo
+  } = props;
+
+  const onChange = () => {
+    toggleTodo(id);
+  };
+  const onRemove = () => {
+    removeTodo(id);
+  };
+
+  return (
+    <li className='todo-item'>
+      <input type='checkbox' onChange={onChange} checked={complete} />
+      <label className={complete ? 'complete' : ''}>{text}</label>
+      <button onClick={onRemove}>&#xd7;</button>
+    </li>
+  );
 }
+
+function Todos(props) {
+  const { todos, toggleTodo, removeTodo } = props;
+  return (
+    <ul>
+      {todos.map(todo => {
+        return (
+          <TodoItem
+            key={todo.id}
+            todo={todo}
+            toggleTodo={toggleTodo}
+            removeTodo={removeTodo}
+          />
+        );
+      })}
+    </ul>
+  );
+}
+
+const LS_KEY = '$-todos_'; //todo list constant
 
 function TodoList() {
   const [todos, setTodos] = useState([]); //init
@@ -55,6 +95,14 @@ function TodoList() {
   const addTodo = useCallback(todo => {
     setTodos(todos => [...todos, todo]);
   }, []);
+
+  useEffect(() => {
+    JSON.parse(localStorage.getItem(LS_KEY));
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(LS_KEY, JSON.stringify(todos));
+  }, [todos]); //run after todos change
 
   const removeTodo = useCallback(id => {
     setTodos(todos =>
@@ -78,10 +126,10 @@ function TodoList() {
   }, []);
 
   return (
-    <Fragment className='todo-list'>
+    <div className='todo-list'>
       <Control addTodo={addTodo} />
-      <Todos removeTodo={removeTodo} toggleTodo={toggleTodo} />
-    </Fragment>
+      <Todos removeTodo={removeTodo} toggleTodo={toggleTodo} todos={todos} />
+    </div>
   );
 }
 
