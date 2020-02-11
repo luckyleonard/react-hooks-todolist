@@ -4,14 +4,14 @@ import React, {
   useMemo,
   useRef,
   useCallback,
-  Fragment
+  memo
 } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
 let idSeq = Date.now(); //time stamp
 
-function Control(props) {
+const Control = memo(function Control(props) {
   const { addTodo } = props;
   const inputRef = useRef();
 
@@ -44,9 +44,9 @@ function Control(props) {
       </form>
     </div>
   );
-}
+});
 
-function TodoItem(props) {
+const TodoItem = memo(function TodoItem(props) {
   const {
     todo: { id, text, complete },
     toggleTodo,
@@ -67,9 +67,9 @@ function TodoItem(props) {
       <button onClick={onRemove}>&#xd7;</button>
     </li>
   );
-}
+});
 
-function Todos(props) {
+const Todos = memo(function Todos(props) {
   const { todos, toggleTodo, removeTodo } = props;
   return (
     <ul>
@@ -85,7 +85,7 @@ function Todos(props) {
       })}
     </ul>
   );
-}
+});
 
 const LS_KEY = '$-todos_'; //todo list constant
 
